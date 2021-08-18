@@ -27,7 +27,7 @@
 		</div>
 		<div v-if="openBag" class="bag-widow">
 			<div v-for="container in player.bag.slots" :key="container.slotId" class="bag-container"> <!--deleteItem(container.slotId)-->
-				<div v-if="container.content != null" @click="itemSelection(player.bag.slots[container.slotId-1].content, container.slotId, player)" style="height: 100%; width: 100%; background-color: violet; border-radius: 100px; display: flex; justify-content: center; align-items: center; overflow: visible; user-select: none;">
+				<div v-if="container.content != null" @click="itemSelection(player.bag.slots[container.slotId-1].content, container.slotId, player)" :style="'height: 100%; width: 100%; background-color: '+(selectedItem.slotId == container.slotId ? 'yellow' : 'violet')+'; border-radius: 100px; display: flex; justify-content: center; align-items: center; overflow: visible; user-select: none;'">
 					{{container.content.name}}
 				</div>
 			</div>
@@ -37,6 +37,9 @@
 		</button>
 		<button v-if="selectedItem.selection" @click="deleteItem(selectedItem.slotId)">
 			delete item
+		</button>
+		<button v-if="selectedItem.selection" @click="unselectItem()">
+			unselect
 		</button>
 		<p style="color: yellow" v-if="selectedItem.selection">
 			{{selectedItem.item[0].name}}
