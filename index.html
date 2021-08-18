@@ -15,11 +15,11 @@
 		<p style="color: red; display: inline-block">Item id</p><input type="number" v-model.number="itemGiverId">
 		<button @click="addItem(itemGiverId, player.bag.slots)">add item {{getItemName(itemGiverId)}}</button>
 		<div class="player-equipment" style="margin: 10px 0 10px 0">
-			<div style="width: 80%; height: 80%; background-color: #dd0000; display: flex; justify-content: center; align-items: center; font-size: 26px" v-if="player.equipment.item[0] != null" @click="itemSelection(player.equipment.item[0], player.equipment.slotId, player)">
+			<div class="player-equipment-item" :style="'background:'+(selectedItem.slotId == player.equipment.slotId ? 'yellow' : 'violet')" v-if="player.equipment.item[0] != null" @click="itemSelection(player.equipment.item[0], player.equipment.slotId, player)">
 				{{player.equipment.item[0].name}}
 			</div>
 		</div>
-		<button :style="player.equipment.item.length > 0 && emptySpace(player.bag.slots) > 0 ? 'background-color: green' : 'background-color: gray'" @click="player.equipment.item.length > 0 && emptySpace(player.bag.slots) > 0 ? unequipItem() : ''">
+		<button :style="unequipButtonStyles" @click="player.equipment.item.length > 0 && emptySpace(player.bag.slots) > 0 ? unequipItem() : ''">
 			unequip item
 		</button>
 		<div class="bag-button" @click="openBag = !openBag" style="margin-bottom: 5px;" :style="openBag ? 'outline: 1px solid yellow' : ''">
@@ -32,7 +32,7 @@
 				</div>
 			</div>
 		</div>
-		<button v-if="selectedItem.selection" :style="selectedItem.target.type == 'player' && selectedItem.item[0].equipable ? 'background-color: green' : 'background-color: gray'" @click="selectedItem.target.type == 'player' && selectedItem.item[0].equipable ? equipItem(selectedItem.item[0], selectedItem.slotId) : ''">
+		<button v-if="selectedItem.selection" :style="equipButtonStyles" @click="selectedItem.target.type == 'player' && selectedItem.item[0].equipable ? equipItem(selectedItem.item[0], selectedItem.slotId) : ''">
 			equip item
 		</button>
 		<button v-if="selectedItem.selection" @click="deleteItem(selectedItem.slotId)">

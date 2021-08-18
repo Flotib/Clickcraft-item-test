@@ -49,3 +49,12 @@ body {
 	height: 80px;
 	background-color: silver;
 }
+
+.player-equipment-item {
+	width: 80%;
+	height: 80%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 26px;
+}
