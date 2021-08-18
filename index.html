@@ -13,14 +13,20 @@
 	<div id="app">
 		<p style="color: red; display: inline-block">bag space</p><input type="number" v-model.number="bagContainers">
 		<p style="color: red; display: inline-block">Item id</p><input type="number" v-model.number="itemGiverId">
-		<button @click="addItem(itemGiverId, playerBag)">add item {{getItemName(itemGiverId)}}</button>
+		<button @click="addItem(itemGiverId, player.bag)">add item {{getItemName(itemGiverId)}}</button>
 		<div class="player-equipment" style="margin: 10px 0 10px 0"></div>
-		<div class="bag-button" @click="openBag = !openBag" style="margin-bottom: 5px;">{{emptySpace(this.playerBag)}}</div>
+		<div class="bag-button" @click="openBag = !openBag" style="margin-bottom: 5px;" :style="openBag ? 'outline: 1px solid yellow' : ''">{{emptySpace(this.player.bag)}}</div>
 		<div v-if="openBag" class="bag-widow">
-			<div v-for="container in playerBag" :key="container.slotId" class="bag-container" @click="deleteItem(container.slotId)">
-				<div v-if="container.content != null" style="height: 100%; width: 100%; background-color: violet; border-radius: 100px; display: flex; justify-content: center; align-items: center; overflow: visible;">{{container.content.name}}</div>
+			<div v-for="container in player.bag" :key="container.slotId" class="bag-container"> <!--deleteItem(container.slotId)-->
+				<div v-if="container.content != null" @click="itemSelection(player.bag[container.slotId-1].content, container.slotId, player)" style="height: 100%; width: 100%; background-color: violet; border-radius: 100px; display: flex; justify-content: center; align-items: center; overflow: visible; user-select: none;">{{container.content.name}}</div>
 			</div>
 		</div>
+		<button v-if="selectedItem.selection" :style="(selectedItem.target.type == 'playerInventory' && selectedItem.item[0].equipable) ? 'background-color: green' : 'background-color: gray'" @click="selectedItem.target.type == 'playerInventory' && selectedItem.item[0].equipable ? equipItem(selectedItem.item[0], selectedItem.slotId) : ''">Equip item</button>
+		<p style="color: yellow" v-if="selectedItem.selection">
+			{{selectedItem.item[0].name}}
+			<br/>
+			{{selectedItem.target.type}}
+		</p>
 	</div>
 	
 	<script src="js/script.js"></script>

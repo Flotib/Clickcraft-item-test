@@ -2,30 +2,42 @@ var app = new Vue({
 	el: '#app',
 	data: {
 		fps: 50,
-		openBag: false,
+		openBag: true,
 		bagContainers: 5,
 		itemGiverId: 0,
-		playerBag: [],
-		playerEquipment: [],
+		selectedItem: {
+				selection: false,
+				item: [],
+				slotId: null,
+				target: null,
+		},
+		player: {
+			type: 'playerInventory', //could be a seller or something else
+			bag: [],
+			equipment: [],
+		},
 		items: [
 			{
 				id: 1,
 				name: 'un',
+				equipable: true,
 			},
 			{
 				id: 2,
 				name: 'deux',
+				equipable: false,
 			},
 			{
 				id: 53,
 				name: 'trois',
+				equipable: true,
 			},
 		]
 	},
 	
 	watch: {
 		bagContainers: function (slots, oldslots) {
-			this.changeSlots(this.playerBag, slots)
+			this.changeSlots(this.player.bag, slots)
 		},
 	},
 
@@ -36,9 +48,9 @@ var app = new Vue({
 	methods: {
 
 		getItemName(id) {
-			let g = this.items.findIndex(item => item.id === id)
-			if (g >= 0 ) {
-				return this.items[g].name
+			let index = this.items.findIndex(item => item.id === id)
+			if (index >= 0 ) {
+				return this.items[index].name
 			}
 		},
 
@@ -50,8 +62,8 @@ var app = new Vue({
 			if (trueId < 0) {
 				return
 			}
-			let emptySlot = this.playerBag.findIndex(slot => slot.content === null)
-			let oldslotId = this.playerBag[emptySlot].slotId
+			let emptySlot = this.player.bag.findIndex(slot => slot.content === null)
+			let oldslotId = this.player.bag[emptySlot].slotId
 			target.splice(emptySlot, 1, {slotId: oldslotId, content: this.items[trueId]})
 		},
 
@@ -76,17 +88,45 @@ var app = new Vue({
 		},
 
 		deleteItem(x) {
-			if (this.playerBag[x-1].content != null) {
-				this.playerBag.splice(x-1, 1, {slotId: x, content: null})
+			if (this.player.bag[x-1].content != null) {
+				this.player.bag.splice(x-1, 1, {slotId: x, content: null})
 			}
+		},
+
+		itemSelection(item, slotId, target) {
+			this.selectedItem.selection = true
+			this.selectedItem.item.splice(0, 1, item)
+			this.selectedItem.slotId = slotId
+			this.selectedItem.target = target
+		},
+
+		equipItem(item, slot) {
+			if (this.player.equipment.length != 0) {
+				let actualItem = this.player.equipment[0]
+				this.player.equipment.splice(0, 1, item)
+				this.player.bag.splice(slot-1, 1, {slotId: slot, content: actualItem})
+				
+			} else {
+				this.player.equipment.splice(0, 1, item)
+				this.player.bag.splice(slot-1, 1, {slotId: slot, content: null})
+			}
+			this.unSelectItem()
+		},
+
+		unSelectItem() {
+			this.selectedItem.selection = false,
+			this.selectedItem.item.shift()
+			this.selectedItem.slotId = null
+			this.selectedItem.target = null
 		},
 	},
 
 	mounted() {
-		
-		this.changeSlots(this.playerBag, this.bagContainers)
+
+		this.changeSlots(this.player.bag, this.bagContainers)
 
 		setInterval(() => {
+
 		}, 1000/this.fps)
 	},
 })
