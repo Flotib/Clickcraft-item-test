@@ -3,7 +3,6 @@ var app = new Vue({
 	data: {
 		fps: 50,
 		openBag: true,
-		bagContainers: 5,
 		itemGiverId: 0,
 		selectedItem: {
 				selection: false,
@@ -12,32 +11,39 @@ var app = new Vue({
 				target: null,
 		},
 		player: {
-			type: 'playerInventory', //could be a seller or something else
-			bag: [],
-			equipment: [],
+			type: 'player', //could be a seller or something else
+			bag: {
+				level: 1,
+				bagSpace: 5,
+				slots: [],
+			},
+			equipment: {
+				item: [],
+				slotId: 0,
+			},
 		},
 		items: [
 			{
 				id: 1,
-				name: 'un',
+				name: 'One',
 				equipable: true,
 			},
 			{
 				id: 2,
-				name: 'deux',
+				name: 'Two',
 				equipable: false,
 			},
 			{
-				id: 53,
-				name: 'trois',
+				id: 4,
+				name: 'Three',
 				equipable: true,
 			},
 		]
 	},
 	
 	watch: {
-		bagContainers: function (slots, oldslots) {
-			this.changeSlots(this.player.bag, slots)
+		'player.bag.bagSpace': function (slots, oldslots) {
+			this.changeSlots(this.player.bag.slots, slots)
 		},
 	},
 
@@ -58,13 +64,15 @@ var app = new Vue({
 			if (this.emptySpace(target) <= 0) {
 				return
 			}
-			let trueId = this.items.findIndex(item => item.id === id)
-			if (trueId < 0) {
+			let index = this.items.findIndex(item => item.id === id)
+			if (index < 0) {
 				return
 			}
-			let emptySlot = this.player.bag.findIndex(slot => slot.content === null)
-			let oldslotId = this.player.bag[emptySlot].slotId
-			target.splice(emptySlot, 1, {slotId: oldslotId, content: this.items[trueId]})
+			let emptySlot = this.player.bag.slots.findIndex(slot => slot.content === null)
+			let oldslotId = this.player.bag.slots[emptySlot].slotId
+			target[emptySlot].slotId = oldslotId
+			let item = JSON.parse(JSON.stringify(this.items))
+			target[emptySlot].content = item[index]
 		},
 
 		changeSlots(target, slots) {
@@ -88,8 +96,8 @@ var app = new Vue({
 		},
 
 		deleteItem(x) {
-			if (this.player.bag[x-1].content != null) {
-				this.player.bag.splice(x-1, 1, {slotId: x, content: null})
+			if (this.player.bag.slots[x-1].content != null) {
+				this.player.bag.slots.splice(x-1, 1, {slotId: x, content: null})
 			}
 		},
 
@@ -101,19 +109,31 @@ var app = new Vue({
 		},
 
 		equipItem(item, slot) {
-			if (this.player.equipment.length != 0) {
-				let actualItem = this.player.equipment[0]
-				this.player.equipment.splice(0, 1, item)
-				this.player.bag.splice(slot-1, 1, {slotId: slot, content: actualItem})
-				
+			if (this.player.equipment.item.length != 0) {
+				let actualItem = this.player.equipment.item[0]
+				actualItem.equipable = true
+				this.player.equipment.item.splice(0, 1, item)
+				this.player.bag.slots.splice(slot-1, 1, {slotId: slot, content: actualItem})
+				this.player.equipment.item[0].equipable = false
 			} else {
-				this.player.equipment.splice(0, 1, item)
-				this.player.bag.splice(slot-1, 1, {slotId: slot, content: null})
+				this.player.equipment.item.splice(0, 1, item)
+				this.player.bag.slots.splice(slot-1, 1, {slotId: slot, content: null})
+				this.player.equipment.item[0].equipable = false
 			}
-			this.unSelectItem()
+			this.unselectItem()
 		},
 
-		unSelectItem() {
+		unequipItem() {
+			let emptySlot = this.player.bag.slots.findIndex(slot => slot.content === null)
+			let actualItem = this.player.equipment.item[0]
+			actualItem.equipable = true
+			this.player.equipment.item.splice(0, 1)
+			this.player.bag.slots.splice(emptySlot, 1, {slotId: emptySlot+1, content: actualItem})
+			this.unselectItem()
+			console.log(this.player.equipment.item)
+		},
+
+		unselectItem() {
 			this.selectedItem.selection = false,
 			this.selectedItem.item.shift()
 			this.selectedItem.slotId = null
@@ -123,7 +143,7 @@ var app = new Vue({
 
 	mounted() {
 
-		this.changeSlots(this.player.bag, this.bagContainers)
+		this.changeSlots(this.player.bag.slots, this.player.bag.bagSpace)
 
 		setInterval(() => {
 
