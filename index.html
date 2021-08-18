@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" content="user-scalable=no">
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+	<link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+	<div id="app">
+		<p style="color: red; display: inline-block">bag space</p><input type="number" v-model.number="bagContainers">
+		<p style="color: red; display: inline-block">Item id</p><input type="number" v-model.number="itemGiverId">
+		<button @click="addItem(itemGiverId, playerBag)">add item {{getItemName(itemGiverId)}}</button>
+		<div class="player-equipment" style="margin: 10px 0 10px 0"></div>
+		<div class="bag-button" @click="openBag = !openBag" style="margin-bottom: 5px;">{{emptySpace(this.playerBag)}}</div>
+		<div v-if="openBag" class="bag-widow">
+			<div v-for="container in playerBag" :key="container.slotId" class="bag-container" @click="deleteItem(container.slotId)">
+				<div v-if="container.content != null" style="height: 100%; width: 100%; background-color: violet; border-radius: 100px; display: flex; justify-content: center; align-items: center; overflow: visible;">{{container.content.name}}</div>
+			</div>
+		</div>
+	</div>
+	
+	<script src="js/script.js"></script>
+</body>
