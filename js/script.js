@@ -2,8 +2,7 @@ var app = new Vue({
 	el: '#app',
 	data: {
 		fps: 50,
-		openBag: true,
-		itemGiverId: 0,
+		giveItemId: 0,
 		selectedItem: {
 			selection: false,
 			item: [],
@@ -13,6 +12,7 @@ var app = new Vue({
 		player: {
 			type: 'player', //could be a seller or something else
 			bag: {
+				open: true,
 				level: 1,
 				bagSpace: 8,
 				slots: [],
